@@ -21,7 +21,8 @@ import {
   UserHandlers, 
   AnalyticsHandlers,
   XcodeHandlers,
-  LocalizationHandlers 
+  LocalizationHandlers,
+  WorkflowHandlers
 } from './handlers/index.js';
 
 // Load environment variables
@@ -43,6 +44,7 @@ class AppStoreConnectServer {
   private analyticsHandlers: AnalyticsHandlers;
   private xcodeHandlers: XcodeHandlers;
   private localizationHandlers: LocalizationHandlers;
+  private workflowHandlers: WorkflowHandlers;
 
   constructor() {
     this.server = new Server({
@@ -63,6 +65,7 @@ class AppStoreConnectServer {
     this.analyticsHandlers = new AnalyticsHandlers(this.client, config);
     this.xcodeHandlers = new XcodeHandlers();
     this.localizationHandlers = new LocalizationHandlers(this.client);
+    this.workflowHandlers = new WorkflowHandlers(this.client);
 
     this.setupHandlers();
   }
@@ -828,6 +831,59 @@ class AppStoreConnectServer {
             },
             required: ["projectPath"]
           }
+        },
+
+        // Workflow Management Tools  
+        {
+          name: "list_workflows",
+          description: "List all App Store Connect workflows (CI products) and their associated apps",
+          inputSchema: {
+            type: "object",
+            properties: {
+              limit: {
+                type: "number",
+                description: "Maximum number of workflows to return (default: 100, max: 200)",
+                minimum: 1,
+                maximum: 200
+              },
+              sort: {
+                type: "string",
+                description: "Sort order for the results",
+                enum: ["name", "-name", "productType", "-productType"]
+              },
+              filter: {
+                type: "object",
+                properties: {
+                  productType: {
+                    type: "string",
+                    description: "Filter by product type",
+                    enum: ["IOS", "MAC_OS", "TV_OS", "VISION_OS"]
+                  }
+                }
+              },
+              include: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: ["app", "bundleId", "primaryRepositories"]
+                },
+                description: "Related resources to include in the response"
+              },
+              fields: {
+                type: "object",
+                properties: {
+                  ciProducts: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      enum: ["name", "productType"]
+                    },
+                    description: "Fields to include for each workflow"
+                  }
+                }
+              }
+            }
+          }
         }
     ];
 
@@ -1034,6 +1090,11 @@ class AppStoreConnectServer {
           // Xcode Development Tools
           case "list_schemes":
             return { toolResult: await this.xcodeHandlers.listSchemes(args as any) };
+
+          // Workflow Management Tools
+          case "list_workflows":
+            const workflowsData = await this.workflowHandlers.listWorkflows(args as any);
+            return formatResponse(workflowsData);
 
           default:
             throw new McpError(
