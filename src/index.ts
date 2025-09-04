@@ -5,6 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
+  CallToolRequest,
   ErrorCode,
   McpError
 } from "@modelcontextprotocol/sdk/types.js";
@@ -909,7 +910,7 @@ class AppStoreConnectServer {
     }));
 
     // Handle tool calls
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
       try {
         const args = request.params.arguments || {};
         
