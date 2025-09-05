@@ -157,13 +157,13 @@ Add the following to your Claude Desktop configuration file:
    - `APP_STORE_CONNECT_KEY_ID`: Your API Key ID
    - `APP_STORE_CONNECT_ISSUER_ID`: Your Issuer ID  
    - `APP_STORE_CONNECT_P8_PATH`: Path to your .p8 private key file
-   - **OR** `APP_STORE_CONNECT_P8_STRING`: The complete contents of your .p8 private key file ✨ **NEW**
+   - **OR** `APP_STORE_CONNECT_P8_B64_STRING`: The base64 encoded contents of your .p8 private key file ✨ **NEW**
 
 **Private Key Configuration**: You can provide your private key in two ways:
 - **File Path** (recommended for local development): Use `APP_STORE_CONNECT_P8_PATH` with the path to your .p8 file
-- **Direct Content** (useful for CI/CD and cloud deployments): Use `APP_STORE_CONNECT_P8_STRING` with the complete .p8 file content as a string
+- **Direct Content** (useful for CI/CD and cloud deployments): Use `APP_STORE_CONNECT_P8_B64_STRING` with the base64 encoded .p8 file content
 
-Example using P8_STRING:
+Example using P8_B64_STRING:
 ```json
 {
   "mcpServers": {
@@ -173,12 +173,26 @@ Example using P8_STRING:
       "env": {
         "APP_STORE_CONNECT_KEY_ID": "YOUR_KEY_ID",
         "APP_STORE_CONNECT_ISSUER_ID": "YOUR_ISSUER_ID",
-        "APP_STORE_CONNECT_P8_STRING": "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT_HERE\n-----END PRIVATE KEY-----"
+        "APP_STORE_CONNECT_P8_B64_STRING": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCllPVVJfUFJJVkFURV9LRVlfQ09OVEVOVF9IRVJFCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0="
       }
     }
   }
 }
 ```
+
+**How to create the base64 encoded private key:**
+
+To create the base64 encoded string from your .p8 file, you can use the following command:
+
+```bash
+# On macOS/Linux
+base64 -i /path/to/your/AuthKey_XXXXXXXXXX.p8
+
+# On Windows (PowerShell)
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\path\to\your\AuthKey_XXXXXXXXXX.p8"))
+```
+
+Copy the resulting base64 string and use it as the value for `APP_STORE_CONNECT_P8_B64_STRING`.
 
 ### Optional Configuration for Sales & Finance Reports
 To enable sales and finance reporting tools, you'll also need:
