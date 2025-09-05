@@ -24,3 +24,6 @@ export * from './screenshots.js';
 
 // Localization types
 export * from './localizations.js';
+
+// Workflows types
+export * from './workflows.js';
