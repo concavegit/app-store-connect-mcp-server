@@ -67,4 +67,26 @@ export class AppStoreConnectClient {
       size: response.headers['content-length']
     };
   }
+
+  async downloadFile(url: string): Promise<string | Buffer> {
+    const token = await this.authService.generateToken();
+    
+    const response = await axios.get(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      responseType: 'arraybuffer'
+    });
+
+    const contentType = response.headers['content-type'] || '';
+    
+    // If it's a text-based file, return as string
+    if (contentType.includes('text/') || contentType.includes('application/json') || 
+        contentType.includes('application/xml') || url.includes('.log') || url.includes('.txt')) {
+      return Buffer.from(response.data).toString('utf-8');
+    }
+    
+    // Otherwise return as Buffer for binary files
+    return Buffer.from(response.data);
+  }
 }

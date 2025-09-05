@@ -961,6 +961,324 @@ class AppStoreConnectServer {
             },
             required: ["ciProductId"]
           }
+        },
+
+        // CI Build Actions Management
+        {
+          name: "list_ci_build_actions",
+          description: "List build actions (analyze, build, test, archive) for a specific build run",
+          inputSchema: {
+            type: "object",
+            properties: {
+              buildRunId: {
+                type: "string",
+                description: "The ID of the build run to list actions for"
+              },
+              limit: {
+                type: "number",
+                description: "Maximum number of build actions to return (default: 100, max: 200)",
+                minimum: 1,
+                maximum: 200
+              },
+              sort: {
+                type: "string",
+                description: "Sort order for the results",
+                enum: ["name", "-name", "actionType", "-actionType", "startedDate", "-startedDate", "finishedDate", "-finishedDate"]
+              },
+              filter: {
+                type: "object",
+                properties: {
+                  actionType: {
+                    type: "string",
+                    enum: ["ANALYZE", "BUILD", "TEST", "ARCHIVE"],
+                    description: "Filter by action type"
+                  },
+                  executionProgress: {
+                    type: "string",
+                    enum: ["PENDING", "RUNNING", "COMPLETE"],
+                    description: "Filter by execution progress"
+                  },
+                  completionStatus: {
+                    type: "string",
+                    enum: ["SUCCEEDED", "FAILED", "ERRORED", "CANCELED", "SKIPPED"],
+                    description: "Filter by completion status"
+                  }
+                }
+              },
+              include: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: ["buildRun", "issues", "testResults", "artifacts"]
+                },
+                description: "Related resources to include in the response"
+              },
+              fields: {
+                type: "object",
+                properties: {
+                  ciBuildActions: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      enum: ["name", "actionType", "startedDate", "finishedDate", "issueCounts", "executionProgress", "completionStatus"]
+                    },
+                    description: "Fields to include for each build action"
+                  }
+                }
+              }
+            },
+            required: ["buildRunId"]
+          }
+        },
+
+        {
+          name: "get_ci_build_action",
+          description: "Get detailed information about a specific build action",
+          inputSchema: {
+            type: "object",
+            properties: {
+              buildActionId: {
+                type: "string",
+                description: "The ID of the build action"
+              },
+              include: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: ["buildRun", "issues", "testResults", "artifacts"]
+                },
+                description: "Related resources to include in the response"
+              },
+              fields: {
+                type: "object",
+                properties: {
+                  ciBuildActions: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      enum: ["name", "actionType", "startedDate", "finishedDate", "issueCounts", "executionProgress", "completionStatus"]
+                    },
+                    description: "Fields to include for the build action"
+                  }
+                }
+              }
+            },
+            required: ["buildActionId"]
+          }
+        },
+
+        // CI Issues Management
+        {
+          name: "list_ci_issues",
+          description: "List issues and errors from a build run or build action",
+          inputSchema: {
+            type: "object",
+            properties: {
+              buildRunId: {
+                type: "string",
+                description: "The ID of the build run to list issues for (provide either buildRunId or buildActionId)"
+              },
+              buildActionId: {
+                type: "string",
+                description: "The ID of the build action to list issues for (provide either buildRunId or buildActionId)"
+              },
+              limit: {
+                type: "number",
+                description: "Maximum number of issues to return (default: 100, max: 200)",
+                minimum: 1,
+                maximum: 200
+              },
+              sort: {
+                type: "string",
+                description: "Sort order for the results",
+                enum: ["issueType", "-issueType", "category", "-category", "message", "-message"]
+              },
+              filter: {
+                type: "object",
+                properties: {
+                  issueType: {
+                    type: "string",
+                    enum: ["ANALYZER_WARNING", "ERROR", "TEST_FAILURE", "WARNING"],
+                    description: "Filter by issue type"
+                  },
+                  category: {
+                    type: "string",
+                    description: "Filter by issue category"
+                  }
+                }
+              },
+              include: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: ["buildAction", "buildRun"]
+                },
+                description: "Related resources to include in the response"
+              },
+              fields: {
+                type: "object",
+                properties: {
+                  ciIssues: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      enum: ["issueType", "message", "fileLocation", "category"]
+                    },
+                    description: "Fields to include for each issue"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        // CI Test Results Management
+        {
+          name: "list_ci_test_results",
+          description: "List test results from a build run or build action",
+          inputSchema: {
+            type: "object",
+            properties: {
+              buildRunId: {
+                type: "string",
+                description: "The ID of the build run to list test results for (provide either buildRunId or buildActionId)"
+              },
+              buildActionId: {
+                type: "string",
+                description: "The ID of the build action to list test results for (provide either buildRunId or buildActionId)"
+              },
+              limit: {
+                type: "number",
+                description: "Maximum number of test results to return (default: 100, max: 200)",
+                minimum: 1,
+                maximum: 200
+              },
+              sort: {
+                type: "string",
+                description: "Sort order for the results",
+                enum: ["className", "-className", "name", "-name", "status", "-status", "duration", "-duration"]
+              },
+              filter: {
+                type: "object",
+                properties: {
+                  status: {
+                    type: "string",
+                    enum: ["SUCCESS", "FAILURE", "SKIPPED"],
+                    description: "Filter by test status"
+                  },
+                  className: {
+                    type: "string",
+                    description: "Filter by test class name"
+                  },
+                  name: {
+                    type: "string",
+                    description: "Filter by test name"
+                  }
+                }
+              },
+              include: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: ["buildAction", "buildRun"]
+                },
+                description: "Related resources to include in the response"
+              },
+              fields: {
+                type: "object",
+                properties: {
+                  ciTestResults: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      enum: ["className", "name", "status", "fileLocation", "failureMessage", "duration"]
+                    },
+                    description: "Fields to include for each test result"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        // CI Artifacts Management
+        {
+          name: "list_ci_artifacts",
+          description: "List artifacts (logs, archives, etc.) from a build run or build action",
+          inputSchema: {
+            type: "object",
+            properties: {
+              buildRunId: {
+                type: "string",
+                description: "The ID of the build run to list artifacts for (provide either buildRunId or buildActionId)"
+              },
+              buildActionId: {
+                type: "string",
+                description: "The ID of the build action to list artifacts for (provide either buildRunId or buildActionId)"
+              },
+              limit: {
+                type: "number",
+                description: "Maximum number of artifacts to return (default: 100, max: 200)",
+                minimum: 1,
+                maximum: 200
+              },
+              sort: {
+                type: "string",
+                description: "Sort order for the results",
+                enum: ["fileName", "-fileName", "fileType", "-fileType", "fileSize", "-fileSize"]
+              },
+              filter: {
+                type: "object",
+                properties: {
+                  fileType: {
+                    type: "string",
+                    enum: ["ARCHIVE", "LOG", "RESULT_BUNDLE", "SOURCE_CODE"],
+                    description: "Filter by file type"
+                  },
+                  fileName: {
+                    type: "string",
+                    description: "Filter by file name"
+                  }
+                }
+              },
+              include: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: ["buildAction", "buildRun"]
+                },
+                description: "Related resources to include in the response"
+              },
+              fields: {
+                type: "object",
+                properties: {
+                  ciArtifacts: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      enum: ["fileName", "fileType", "fileSize", "downloadUrl"]
+                    },
+                    description: "Fields to include for each artifact"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        {
+          name: "download_ci_artifact",
+          description: "Download a specific build artifact (such as log files)",
+          inputSchema: {
+            type: "object",
+            properties: {
+              artifactId: {
+                type: "string",
+                description: "The ID of the artifact to download"
+              }
+            },
+            required: ["artifactId"]
+          }
         }
     ];
 
@@ -1176,6 +1494,39 @@ class AppStoreConnectServer {
           case "list_build_runs":
             const buildRunsData = await this.workflowHandlers.listBuildRuns(args as any);
             return formatResponse(buildRunsData);
+
+          // CI Build Actions Management
+          case "list_ci_build_actions":
+            const buildActionsData = await this.workflowHandlers.listBuildActions(args as any);
+            return formatResponse(buildActionsData);
+
+          case "get_ci_build_action":
+            const buildActionData = await this.workflowHandlers.getBuildAction(args as any);
+            return formatResponse(buildActionData);
+
+          // CI Issues Management
+          case "list_ci_issues":
+            const issuesData = await this.workflowHandlers.listIssues(args as any);
+            return formatResponse(issuesData);
+
+          // CI Test Results Management
+          case "list_ci_test_results":
+            const testResultsData = await this.workflowHandlers.listTestResults(args as any);
+            return formatResponse(testResultsData);
+
+          // CI Artifacts Management
+          case "list_ci_artifacts":
+            const artifactsData = await this.workflowHandlers.listArtifacts(args as any);
+            return formatResponse(artifactsData);
+
+          case "download_ci_artifact":
+            const downloadResult = await this.workflowHandlers.downloadArtifact(args as any);
+            // If the result already contains content, return it directly
+            if (downloadResult.content) {
+              return downloadResult;
+            }
+            // Otherwise format as text
+            return formatResponse(downloadResult);
 
           default:
             throw new McpError(

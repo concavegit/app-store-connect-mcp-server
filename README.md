@@ -91,6 +91,14 @@ This server transforms complex App Store Connect operations into simple conversa
   - Access build artifacts and related resources
   - Monitor CI/CD pipeline status and results
 
+- **CI Build Debugging & Logs** ✨ **NEW**
+  - List build actions (analyze, build, test, archive) for build runs
+  - Get detailed build action information with logs and artifacts
+  - List and filter build issues and errors by type and category
+  - Access test results with failure details and file locations
+  - List and download build artifacts including log files
+  - Comprehensive debugging support for failed builds and tests
+
 ## Installation
 
 ### Using Smithery
@@ -649,6 +657,120 @@ List build runs for a specific workflow/CI product, including detailed git commi
 "Show recent failed builds for this CI product"
 "List build runs including git commit details and pull request information"
 "Show only pull request builds from the last week"
+```
+
+#### `list_ci_build_actions`
+List build actions (analyze, build, test, archive) for a specific build run.
+
+**Parameters:**
+- `buildRunId` (required): The ID of the build run to list actions for
+- `limit` (optional): Maximum number of build actions to return (default: 100, max: 200)
+- `sort` (optional): Sort by `name`, `-name`, `actionType`, `-actionType`, `startedDate`, `-startedDate`, `finishedDate`, `-finishedDate`
+- `filter` (optional): Filter by:
+  - `actionType`: `ANALYZE`, `BUILD`, `TEST`, `ARCHIVE`
+  - `executionProgress`: `PENDING`, `RUNNING`, `COMPLETE`
+  - `completionStatus`: `SUCCEEDED`, `FAILED`, `ERRORED`, `CANCELED`, `SKIPPED`
+- `include` (optional): Include related resources (`buildRun`, `issues`, `testResults`, `artifacts`)
+- `fields` (optional): Select specific fields for `ciBuildActions`
+
+**Example:**
+```
+"List build actions for build run xyz789"
+"Show failed build actions for build run xyz789"
+"List test actions including issues and test results"
+```
+
+#### `get_ci_build_action`
+Get detailed information about a specific build action.
+
+**Parameters:**
+- `buildActionId` (required): The ID of the build action
+- `include` (optional): Include related resources (`buildRun`, `issues`, `testResults`, `artifacts`)
+- `fields` (optional): Select specific fields for `ciBuildActions`
+
+**Example:**
+```
+"Get build action details for action ABC123"
+"Show build action ABC123 with related issues and artifacts"
+```
+
+#### `list_ci_issues`
+List issues and errors from a build run or build action.
+
+**Parameters:**
+- `buildRunId` (optional): The ID of the build run to list issues for (provide either buildRunId or buildActionId)
+- `buildActionId` (optional): The ID of the build action to list issues for (provide either buildRunId or buildActionId)
+- `limit` (optional): Maximum number of issues to return (default: 100, max: 200)
+- `sort` (optional): Sort by `issueType`, `-issueType`, `category`, `-category`, `message`, `-message`
+- `filter` (optional): Filter by:
+  - `issueType`: `ANALYZER_WARNING`, `ERROR`, `TEST_FAILURE`, `WARNING`
+  - `category`: Issue category string
+- `include` (optional): Include related resources (`buildAction`, `buildRun`)
+- `fields` (optional): Select specific fields for `ciIssues`
+
+**Example:**
+```
+"List all errors from build run xyz789"
+"Show warnings from build action ABC123"
+"List test failures with file locations"
+```
+
+#### `list_ci_test_results`
+List test results from a build run or build action.
+
+**Parameters:**
+- `buildRunId` (optional): The ID of the build run to list test results for (provide either buildRunId or buildActionId)
+- `buildActionId` (optional): The ID of the build action to list test results for (provide either buildRunId or buildActionId)
+- `limit` (optional): Maximum number of test results to return (default: 100, max: 200)
+- `sort` (optional): Sort by `className`, `-className`, `name`, `-name`, `status`, `-status`, `duration`, `-duration`
+- `filter` (optional): Filter by:
+  - `status`: `SUCCESS`, `FAILURE`, `SKIPPED`
+  - `className`: Test class name
+  - `name`: Test method name
+- `include` (optional): Include related resources (`buildAction`, `buildRun`)
+- `fields` (optional): Select specific fields for `ciTestResults`
+
+**Example:**
+```
+"List failed tests from build run xyz789"
+"Show test results for MyTestClass"
+"List all test results with failure messages"
+```
+
+#### `list_ci_artifacts`
+List artifacts (logs, archives, etc.) from a build run or build action.
+
+**Parameters:**
+- `buildRunId` (optional): The ID of the build run to list artifacts for (provide either buildRunId or buildActionId)
+- `buildActionId` (optional): The ID of the build action to list artifacts for (provide either buildRunId or buildActionId)
+- `limit` (optional): Maximum number of artifacts to return (default: 100, max: 200)
+- `sort` (optional): Sort by `fileName`, `-fileName`, `fileType`, `-fileType`, `fileSize`, `-fileSize`
+- `filter` (optional): Filter by:
+  - `fileType`: `ARCHIVE`, `LOG`, `RESULT_BUNDLE`, `SOURCE_CODE`
+  - `fileName`: File name pattern
+- `include` (optional): Include related resources (`buildAction`, `buildRun`)
+- `fields` (optional): Select specific fields for `ciArtifacts`
+
+**Example:**
+```
+"List log files from build run xyz789"
+"Show all artifacts from failed build action"
+"List result bundles with download URLs"
+```
+
+#### `download_ci_artifact`
+Download a specific build artifact (such as log files).
+
+**Parameters:**
+- `artifactId` (required): The ID of the artifact to download
+
+**Returns:** The artifact content. Log files and text files are returned as readable text, while binary files are returned as base64-encoded data.
+
+**Example:**
+```
+"Download artifact LOG123"
+"Get the build log from artifact LOG123"
+"Download test result bundle BUNDLE456"
 ```
 
 ## Error Handling
