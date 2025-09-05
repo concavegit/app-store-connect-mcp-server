@@ -5,6 +5,7 @@ import { ListToolsRequestSchema, CallToolRequestSchema, ErrorCode, McpError } fr
 import axios from 'axios';
 import { AppStoreConnectClient } from './services/index.js';
 import { AppHandlers, BetaHandlers, BundleHandlers, DeviceHandlers, UserHandlers, AnalyticsHandlers, XcodeHandlers, LocalizationHandlers, WorkflowHandlers } from './handlers/index.js';
+
 // Load environment variables
 const config = {
     keyId: process.env.APP_STORE_CONNECT_KEY_ID,
@@ -24,6 +25,7 @@ class AppStoreConnectServer {
     xcodeHandlers;
     localizationHandlers;
     workflowHandlers;
+
     constructor() {
         this.server = new Server({
             name: "appstore-connect-server",
