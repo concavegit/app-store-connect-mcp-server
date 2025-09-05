@@ -250,12 +250,6 @@ export interface CiBuildAction {
         type: "ciTestResults";
       }>;
     };
-    artifacts?: {
-      data?: Array<{
-        id: string;
-        type: "ciArtifacts";
-      }>;
-    };
   };
 }
 
@@ -263,7 +257,7 @@ export interface CiBuildActionsResponse {
   data: CiBuildAction[];
   included?: Array<{
     id: string;
-    type: "ciBuildRuns" | "ciIssues" | "ciTestResults" | "ciArtifacts";
+    type: "ciBuildRuns" | "ciIssues" | "ciTestResults";
     attributes: any;
   }>;
   links?: {
@@ -303,8 +297,7 @@ export type CiBuildActionFieldOptions =
 export type CiBuildActionIncludeOptions =
   | "buildRun"
   | "issues"
-  | "testResults"
-  | "artifacts";
+  | "testResults";
 
 // CI Issue Types
 export interface CiIssue {
@@ -448,71 +441,5 @@ export type CiTestResultFieldOptions =
   | "duration";
 
 export type CiTestResultIncludeOptions =
-  | "buildAction"
-  | "buildRun";
-
-// CI Artifact Types
-export interface CiArtifact {
-  id: string;
-  type: "ciArtifacts";
-  attributes: {
-    fileName: string;
-    fileType: "ARCHIVE" | "LOG" | "RESULT_BUNDLE" | "SOURCE_CODE";
-    fileSize?: number;
-    downloadUrl?: string;
-  };
-  relationships?: {
-    buildAction?: {
-      data?: {
-        id: string;
-        type: "ciBuildActions";
-      };
-    };
-    buildRun?: {
-      data?: {
-        id: string;
-        type: "ciBuildRuns";
-      };
-    };
-  };
-}
-
-export interface CiArtifactsResponse {
-  data: CiArtifact[];
-  included?: Array<{
-    id: string;
-    type: "ciBuildActions" | "ciBuildRuns";
-    attributes: any;
-  }>;
-  links?: {
-    self: string;
-    first?: string;
-    next?: string;
-  };
-  meta?: {
-    paging: {
-      total: number;
-      limit: number;
-    };
-  };
-}
-
-export interface CiArtifactFilters {
-  fileType?: "ARCHIVE" | "LOG" | "RESULT_BUNDLE" | "SOURCE_CODE";
-  fileName?: string;
-}
-
-export type CiArtifactSortOptions = 
-  | "fileName" | "-fileName"
-  | "fileType" | "-fileType"
-  | "fileSize" | "-fileSize";
-
-export type CiArtifactFieldOptions = 
-  | "fileName"
-  | "fileType"
-  | "fileSize"
-  | "downloadUrl";
-
-export type CiArtifactIncludeOptions =
   | "buildAction"
   | "buildRun";

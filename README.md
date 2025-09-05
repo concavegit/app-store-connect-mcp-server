@@ -88,15 +88,13 @@ This server transforms complex App Store Connect operations into simple conversa
   - List build runs for specific workflows/CI products
   - View detailed build information including git commit details (SHA, message, author, etc.)
   - Filter builds by status, date, pull request builds, execution progress
-  - Access build artifacts and related resources
   - Monitor CI/CD pipeline status and results
 
 - **CI Build Debugging & Logs** ✨ **NEW**
   - List build actions (analyze, build, test, archive) for build runs
-  - Get detailed build action information with logs and artifacts
+  - Get detailed build action information
   - List and filter build issues and errors by type and category
   - Access test results with failure details and file locations
-  - List and download build artifacts including log files
   - Comprehensive debugging support for failed builds and tests
 
 ## Installation
@@ -670,7 +668,7 @@ List build actions (analyze, build, test, archive) for a specific build run.
   - `actionType`: `ANALYZE`, `BUILD`, `TEST`, `ARCHIVE`
   - `executionProgress`: `PENDING`, `RUNNING`, `COMPLETE`
   - `completionStatus`: `SUCCEEDED`, `FAILED`, `ERRORED`, `CANCELED`, `SKIPPED`
-- `include` (optional): Include related resources (`buildRun`, `issues`, `testResults`, `artifacts`)
+- `include` (optional): Include related resources (`buildRun`, `issues`, `testResults`)
 - `fields` (optional): Select specific fields for `ciBuildActions`
 
 **Example:**
@@ -685,13 +683,13 @@ Get detailed information about a specific build action.
 
 **Parameters:**
 - `buildActionId` (required): The ID of the build action
-- `include` (optional): Include related resources (`buildRun`, `issues`, `testResults`, `artifacts`)
+- `include` (optional): Include related resources (`buildRun`, `issues`, `testResults`)
 - `fields` (optional): Select specific fields for `ciBuildActions`
 
 **Example:**
 ```
 "Get build action details for action ABC123"
-"Show build action ABC123 with related issues and artifacts"
+"Show build action ABC123 with related issues and test results"
 ```
 
 #### `list_ci_issues`
@@ -735,42 +733,6 @@ List test results from a build run or build action.
 "List failed tests from build run xyz789"
 "Show test results for MyTestClass"
 "List all test results with failure messages"
-```
-
-#### `list_ci_artifacts`
-List artifacts (logs, archives, etc.) from a build run or build action.
-
-**Parameters:**
-- `buildRunId` (optional): The ID of the build run to list artifacts for (provide either buildRunId or buildActionId)
-- `buildActionId` (optional): The ID of the build action to list artifacts for (provide either buildRunId or buildActionId)
-- `limit` (optional): Maximum number of artifacts to return (default: 100, max: 200)
-- `sort` (optional): Sort by `fileName`, `-fileName`, `fileType`, `-fileType`, `fileSize`, `-fileSize`
-- `filter` (optional): Filter by:
-  - `fileType`: `ARCHIVE`, `LOG`, `RESULT_BUNDLE`, `SOURCE_CODE`
-  - `fileName`: File name pattern
-- `include` (optional): Include related resources (`buildAction`, `buildRun`)
-- `fields` (optional): Select specific fields for `ciArtifacts`
-
-**Example:**
-```
-"List log files from build run xyz789"
-"Show all artifacts from failed build action"
-"List result bundles with download URLs"
-```
-
-#### `download_ci_artifact`
-Download a specific build artifact (such as log files).
-
-**Parameters:**
-- `artifactId` (required): The ID of the artifact to download
-
-**Returns:** The artifact content. Log files and text files are returned as readable text, while binary files are returned as base64-encoded data.
-
-**Example:**
-```
-"Download artifact LOG123"
-"Get the build log from artifact LOG123"
-"Download test result bundle BUNDLE456"
 ```
 
 ## Error Handling

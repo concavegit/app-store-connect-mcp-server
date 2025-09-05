@@ -974,7 +974,7 @@ class AppStoreConnectServer {
                             type: "array",
                             items: {
                                 type: "string",
-                                enum: ["buildRun", "issues", "testResults", "artifacts"]
+                                enum: ["buildRun", "issues", "testResults"]
                             },
                             description: "Related resources to include in the response"
                         },
@@ -1009,7 +1009,7 @@ class AppStoreConnectServer {
                             type: "array",
                             items: {
                                 type: "string",
-                                enum: ["buildRun", "issues", "testResults", "artifacts"]
+                                enum: ["buildRun", "issues", "testResults"]
                             },
                             description: "Related resources to include in the response"
                         },
@@ -1160,84 +1160,6 @@ class AppStoreConnectServer {
                             }
                         }
                     }
-                }
-            },
-            // CI Artifacts Management
-            {
-                name: "list_ci_artifacts",
-                description: "List artifacts (logs, archives, etc.) from a build run or build action",
-                inputSchema: {
-                    type: "object",
-                    properties: {
-                        buildRunId: {
-                            type: "string",
-                            description: "The ID of the build run to list artifacts for (provide either buildRunId or buildActionId)"
-                        },
-                        buildActionId: {
-                            type: "string",
-                            description: "The ID of the build action to list artifacts for (provide either buildRunId or buildActionId)"
-                        },
-                        limit: {
-                            type: "number",
-                            description: "Maximum number of artifacts to return (default: 100, max: 200)",
-                            minimum: 1,
-                            maximum: 200
-                        },
-                        sort: {
-                            type: "string",
-                            description: "Sort order for the results",
-                            enum: ["fileName", "-fileName", "fileType", "-fileType", "fileSize", "-fileSize"]
-                        },
-                        filter: {
-                            type: "object",
-                            properties: {
-                                fileType: {
-                                    type: "string",
-                                    enum: ["ARCHIVE", "LOG", "RESULT_BUNDLE", "SOURCE_CODE"],
-                                    description: "Filter by file type"
-                                },
-                                fileName: {
-                                    type: "string",
-                                    description: "Filter by file name"
-                                }
-                            }
-                        },
-                        include: {
-                            type: "array",
-                            items: {
-                                type: "string",
-                                enum: ["buildAction", "buildRun"]
-                            },
-                            description: "Related resources to include in the response"
-                        },
-                        fields: {
-                            type: "object",
-                            properties: {
-                                ciArtifacts: {
-                                    type: "array",
-                                    items: {
-                                        type: "string",
-                                        enum: ["fileName", "fileType", "fileSize", "downloadUrl"]
-                                    },
-                                    description: "Fields to include for each artifact"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                name: "download_ci_artifact",
-                description: "Download a specific build artifact (such as log files)",
-                inputSchema: {
-                    type: "object",
-                    properties: {
-                        artifactId: {
-                            type: "string",
-                            description: "The ID of the artifact to download"
-                        }
-                    },
-                    required: ["artifactId"]
                 }
             }
         ];
@@ -1428,18 +1350,6 @@ class AppStoreConnectServer {
                     case "list_ci_test_results":
                         const testResultsData = await this.workflowHandlers.listTestResults(args);
                         return formatResponse(testResultsData);
-                    // CI Artifacts Management
-                    case "list_ci_artifacts":
-                        const artifactsData = await this.workflowHandlers.listArtifacts(args);
-                        return formatResponse(artifactsData);
-                    case "download_ci_artifact":
-                        const downloadResult = await this.workflowHandlers.downloadArtifact(args);
-                        // If the result already contains content, return it directly
-                        if (downloadResult.content) {
-                            return downloadResult;
-                        }
-                        // Otherwise format as text
-                        return formatResponse(downloadResult);
                     default:
                         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${request.params.name}`);
                 }
