@@ -918,7 +918,7 @@ class AppStoreConnectServer {
                                     type: "array",
                                     items: {
                                         type: "string",
-                                        enum: ["number", "createdDate", "startedDate", "finishedDate", "sourceCommit", "destinationCommit", "isPullRequestBuild", "issueCounts", "executionProgress", "completionStatus", "startReason", "cancelReason", "clean"]
+                                        enum: ["number", "createdDate", "startedDate", "finishedDate", "sourceCommit", "destinationCommit", "isPullRequestBuild", "issueCounts", "executionProgress", "completionStatus", "startReason", "cancelReason"]
                                     },
                                     description: "Fields to include for each build run"
                                 }

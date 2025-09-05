@@ -112,7 +112,6 @@ export interface CiBuildRun {
     completionStatus?: "SUCCEEDED" | "FAILED" | "ERRORED" | "CANCELED" | "SKIPPED";
     startReason?: "MANUAL" | "SCM_CHANGE" | "PULL_REQUEST_UPDATE" | "SCHEDULED";
     cancelReason?: "AUTOMATICALLY_BY_NEWER_BUILD" | "MANUALLY_BY_USER";
-    clean?: boolean;
   };
   relationships?: {
     builds?: {
@@ -204,8 +203,7 @@ export type CiBuildRunFieldOptions =
   | "executionProgress"
   | "completionStatus"
   | "startReason"
-  | "cancelReason"
-  | "clean";
+  | "cancelReason";
 
 export type CiBuildRunIncludeOptions =
   | "builds"
