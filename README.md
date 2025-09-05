@@ -83,6 +83,14 @@ This server transforms complex App Store Connect operations into simple conversa
   - List available schemes in Xcode projects and workspaces
   - Integrate with development workflows and CI/CD pipelines
 
+- **Workflow & Build Management** ✨ **NEW**
+  - List workflows (CI products) for your team
+  - List build runs for specific workflows/CI products
+  - View detailed build information including git commit details (SHA, message, author, etc.)
+  - Filter builds by status, date, pull request builds, execution progress
+  - Access build artifacts and related resources
+  - Monitor CI/CD pipeline status and results
+
 ## Installation
 
 ### Using Smithery
@@ -143,6 +151,28 @@ Add the following to your Claude Desktop configuration file:
    - `APP_STORE_CONNECT_KEY_ID`: Your API Key ID
    - `APP_STORE_CONNECT_ISSUER_ID`: Your Issuer ID  
    - `APP_STORE_CONNECT_P8_PATH`: Path to your .p8 private key file
+   - **OR** `APP_STORE_CONNECT_P8_STRING`: The complete contents of your .p8 private key file ✨ **NEW**
+
+**Private Key Configuration**: You can provide your private key in two ways:
+- **File Path** (recommended for local development): Use `APP_STORE_CONNECT_P8_PATH` with the path to your .p8 file
+- **Direct Content** (useful for CI/CD and cloud deployments): Use `APP_STORE_CONNECT_P8_STRING` with the complete .p8 file content as a string
+
+Example using P8_STRING:
+```json
+{
+  "mcpServers": {
+    "app-store-connect": {
+      "command": "npx",
+      "args": ["-y", "appstore-connect-mcp-server"],
+      "env": {
+        "APP_STORE_CONNECT_KEY_ID": "YOUR_KEY_ID",
+        "APP_STORE_CONNECT_ISSUER_ID": "YOUR_ISSUER_ID",
+        "APP_STORE_CONNECT_P8_STRING": "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT_HERE\n-----END PRIVATE KEY-----"
+      }
+    }
+  }
+}
+```
 
 ### Optional Configuration for Sales & Finance Reports
 To enable sales and finance reporting tools, you'll also need:
@@ -569,6 +599,56 @@ List all available schemes in an Xcode project or workspace.
 ```
 "List schemes in /Users/john/MyApp/MyApp.xcodeproj"
 "Show available schemes for MyApp.xcworkspace"
+```
+
+### 🚀 Workflow & Build Management Tools ✨ **NEW**
+
+#### `list_workflows`
+List all App Store Connect workflows (CI products) and their associated apps.
+
+**Parameters:**
+- `limit` (optional): Maximum number of workflows to return (default: 100, max: 200)
+- `sort` (optional): Sort by `name`, `-name`, `productType`, or `-productType`
+- `filter` (optional): Filter by `productType` (`IOS`, `MAC_OS`, `TV_OS`, `VISION_OS`)
+- `include` (optional): Include related resources (`app`, `bundleId`, `primaryRepositories`)
+- `fields` (optional): Select specific fields for `ciProducts`
+
+**Example:**
+```
+"List all workflows for my team"
+"Show iOS workflows with their associated apps"
+"List workflows sorted by name including bundle ID information"
+```
+
+#### `list_build_runs`
+List build runs for a specific workflow/CI product, including detailed git commit information.
+
+**Parameters:**
+- `ciProductId` (required): The ID of the CI product (workflow) to list build runs for
+- `limit` (optional): Maximum number of build runs to return (default: 100, max: 200)
+- `sort` (optional): Sort by `number`, `-number`, `createdDate`, `-createdDate`, `startedDate`, `-startedDate`, `finishedDate`, `-finishedDate`
+- `filter` (optional): Filter by:
+  - `number`: Build run number
+  - `isPullRequestBuild`: Whether it's a pull request build
+  - `executionProgress`: `PENDING`, `RUNNING`, `COMPLETE`
+  - `completionStatus`: `SUCCEEDED`, `FAILED`, `ERRORED`, `CANCELED`, `SKIPPED`
+  - `startReason`: `MANUAL`, `SCM_CHANGE`, `PULL_REQUEST_UPDATE`, `SCHEDULED`
+- `include` (optional): Include related resources (`builds`, `workflow`, `product`, `sourceBranchOrTag`, `destinationBranch`, `pullRequest`)
+- `fields` (optional): Select specific fields for `ciBuildRuns`
+
+**Git Commit Information:** Each build run includes detailed git commit information such as:
+- Commit SHA (source and destination)
+- Commit message
+- Author and committer details
+- Web URL for the commit
+- Pull request information (if applicable)
+
+**Example:**
+```
+"List build runs for workflow abc123-def456-ghi789"
+"Show recent failed builds for this CI product"
+"List build runs including git commit details and pull request information"
+"Show only pull request builds from the last week"
 ```
 
 ## Error Handling

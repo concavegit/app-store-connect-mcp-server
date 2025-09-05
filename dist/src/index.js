@@ -5,12 +5,12 @@ import { ListToolsRequestSchema, CallToolRequestSchema, ErrorCode, McpError } fr
 import axios from 'axios';
 import { AppStoreConnectClient } from './services/index.js';
 import { AppHandlers, BetaHandlers, BundleHandlers, DeviceHandlers, UserHandlers, AnalyticsHandlers, XcodeHandlers, LocalizationHandlers, WorkflowHandlers } from './handlers/index.js';
-
 // Load environment variables
 const config = {
     keyId: process.env.APP_STORE_CONNECT_KEY_ID,
     issuerId: process.env.APP_STORE_CONNECT_ISSUER_ID,
     privateKeyPath: process.env.APP_STORE_CONNECT_P8_PATH,
+    privateKeyString: process.env.APP_STORE_CONNECT_P8_STRING,
     vendorNumber: process.env.APP_STORE_CONNECT_VENDOR_NUMBER, // Optional for sales/finance reports
 };
 class AppStoreConnectServer {
@@ -25,7 +25,6 @@ class AppStoreConnectServer {
     xcodeHandlers;
     localizationHandlers;
     workflowHandlers;
-
     constructor() {
         this.server = new Server({
             name: "appstore-connect-server",
@@ -853,6 +852,81 @@ class AppStoreConnectServer {
                         }
                     }
                 }
+            },
+            // Build Run Management Tools
+            {
+                name: "list_build_runs",
+                description: "List build runs for a specific workflow/CI product, including git commit information",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        ciProductId: {
+                            type: "string",
+                            description: "The ID of the CI product (workflow) to list build runs for"
+                        },
+                        limit: {
+                            type: "number",
+                            description: "Maximum number of build runs to return (default: 100, max: 200)",
+                            minimum: 1,
+                            maximum: 200
+                        },
+                        sort: {
+                            type: "string",
+                            description: "Sort order for the results",
+                            enum: ["number", "-number", "createdDate", "-createdDate", "startedDate", "-startedDate", "finishedDate", "-finishedDate"]
+                        },
+                        filter: {
+                            type: "object",
+                            properties: {
+                                number: {
+                                    type: "number",
+                                    description: "Filter by build run number"
+                                },
+                                isPullRequestBuild: {
+                                    type: "boolean",
+                                    description: "Filter by whether it's a pull request build"
+                                },
+                                executionProgress: {
+                                    type: "string",
+                                    enum: ["PENDING", "RUNNING", "COMPLETE"],
+                                    description: "Filter by execution progress"
+                                },
+                                completionStatus: {
+                                    type: "string",
+                                    enum: ["SUCCEEDED", "FAILED", "ERRORED", "CANCELED", "SKIPPED"],
+                                    description: "Filter by completion status"
+                                },
+                                startReason: {
+                                    type: "string",
+                                    enum: ["MANUAL", "SCM_CHANGE", "PULL_REQUEST_UPDATE", "SCHEDULED"],
+                                    description: "Filter by start reason"
+                                }
+                            }
+                        },
+                        include: {
+                            type: "array",
+                            items: {
+                                type: "string",
+                                enum: ["builds", "workflow", "product", "sourceBranchOrTag", "destinationBranch", "pullRequest"]
+                            },
+                            description: "Related resources to include in the response"
+                        },
+                        fields: {
+                            type: "object",
+                            properties: {
+                                ciBuildRuns: {
+                                    type: "array",
+                                    items: {
+                                        type: "string",
+                                        enum: ["number", "createdDate", "startedDate", "finishedDate", "sourceCommit", "destinationCommit", "isPullRequestBuild", "issueCounts", "executionProgress", "completionStatus", "startReason", "cancelReason"]
+                                    },
+                                    description: "Fields to include for each build run"
+                                }
+                            }
+                        }
+                    },
+                    required: ["ciProductId"]
+                }
             }
         ];
         // Sales and Finance Report tools - only available if vendor number is configured
@@ -1024,6 +1098,9 @@ class AppStoreConnectServer {
                     case "list_workflows":
                         const workflowsData = await this.workflowHandlers.listWorkflows(args);
                         return formatResponse(workflowsData);
+                    case "list_build_runs":
+                        const buildRunsData = await this.workflowHandlers.listBuildRuns(args);
+                        return formatResponse(buildRunsData);
                     default:
                         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${request.params.name}`);
                 }

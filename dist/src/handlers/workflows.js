@@ -19,4 +19,19 @@ export class WorkflowHandlers {
         Object.assign(params, buildFieldParams(fields));
         return this.client.get('/ciProducts', params);
     }
+    async listBuildRuns(args) {
+        const { ciProductId, limit = 100, sort, filter, fields, include } = args;
+        const params = {
+            limit: sanitizeLimit(limit)
+        };
+        if (sort) {
+            params.sort = sort;
+        }
+        if (include?.length) {
+            params.include = include.join(',');
+        }
+        Object.assign(params, buildFilterParams(filter));
+        Object.assign(params, buildFieldParams(fields));
+        return this.client.get(`/ciProducts/${ciProductId}/buildRuns`, params);
+    }
 }

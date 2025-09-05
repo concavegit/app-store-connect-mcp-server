@@ -6,7 +6,15 @@ export class AuthService {
   constructor(private config: AppStoreConnectConfig) {}
 
   async generateToken(): Promise<string> {
-    const privateKey = await fs.readFile(this.config.privateKeyPath, 'utf-8');
+    let privateKey: string;
+    
+    if (this.config.privateKeyString) {
+      privateKey = this.config.privateKeyString;
+    } else if (this.config.privateKeyPath) {
+      privateKey = await fs.readFile(this.config.privateKeyPath, 'utf-8');
+    } else {
+      throw new Error("Either privateKeyPath or privateKeyString must be provided");
+    }
     
     const token = jwt.sign({}, privateKey, {
       algorithm: 'ES256',
@@ -20,10 +28,17 @@ export class AuthService {
   }
 
   validateConfig(): void {
-    if (!this.config.keyId || !this.config.issuerId || !this.config.privateKeyPath) {
+    if (!this.config.keyId || !this.config.issuerId) {
       throw new Error(
         "Missing required environment variables. Please set: " +
-        "APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_P8_PATH"
+        "APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID"
+      );
+    }
+    
+    if (!this.config.privateKeyPath && !this.config.privateKeyString) {
+      throw new Error(
+        "Missing private key configuration. Please set either: " +
+        "APP_STORE_CONNECT_P8_PATH (file path) or APP_STORE_CONNECT_P8_STRING (key content)"
       );
     }
   }
