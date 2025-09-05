@@ -1,7 +1,8 @@
 export interface AppStoreConnectConfig {
   keyId: string;
   issuerId: string;
-  privateKeyPath: string;
+  privateKeyPath?: string;
+  privateKeyString?: string;
   vendorNumber?: string; // Optional vendor number for sales and finance reports
 }
 
