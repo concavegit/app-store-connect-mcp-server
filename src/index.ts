@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { Server } from "@modelcontextprotocol/sdk/server";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
   CallToolRequest,
   ErrorCode,
   McpError
-} from "@modelcontextprotocol/sdk/types.js";
+} from "@modelcontextprotocol/sdk/types";
 import axios from 'axios';
 
 import { AppStoreConnectConfig } from './types/index.js';
@@ -1122,7 +1122,7 @@ class AppStoreConnectServer {
                     type: "array",
                     items: {
                       type: "string",
-                      enum: ["issueType", "message", "category"]
+                      enum: ["issueType", "message", "fileSource", "category"]
                     },
                     description: "Fields to include for each issue"
                   }
@@ -1191,7 +1191,7 @@ class AppStoreConnectServer {
                     type: "array",
                     items: {
                       type: "string",
-                      enum: ["className", "name", "status", "failureMessage", "duration"]
+                      enum: ["className", "name", "status", "fileSource", "message", "destinationTestResults"]
                     },
                     description: "Fields to include for each test result"
                   }
