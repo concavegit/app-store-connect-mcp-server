@@ -436,9 +436,9 @@ export type CiTestResultFieldOptions =
   | "className"
   | "name"
   | "status"
-  | "fileLocation"
-  | "failureMessage"
-  | "duration";
+  | "fileSource"
+  | "message"
+  | "destinationTestResults";
 
 export type CiTestResultIncludeOptions =
   | "buildAction"

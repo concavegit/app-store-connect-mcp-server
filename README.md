@@ -94,7 +94,7 @@ This server transforms complex App Store Connect operations into simple conversa
   - List build actions (analyze, build, test, archive) for build runs
   - Get detailed build action information
   - List and filter build issues and errors by type and category
-  - Access test results with failure details and file locations
+  - Access test results with failure details and associated metadata
   - Comprehensive debugging support for failed builds and tests
 
 ## Installation
@@ -724,7 +724,7 @@ List issues and errors from a build run or build action.
 ```
 "List all errors from build run xyz789"
 "Show warnings from build action ABC123"
-"List test failures with file locations"
+"List test failures from build action ABC123"
 ```
 
 #### `list_ci_test_results`

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { Server } from "@modelcontextprotocol/sdk/server";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   ListToolsRequestSchema,
@@ -1191,7 +1191,7 @@ class AppStoreConnectServer {
                     type: "array",
                     items: {
                       type: "string",
-                      enum: ["className", "name", "status", "fileLocation", "failureMessage", "duration"]
+                      enum: ["className", "name", "status", "fileSource", "message", "destinationTestResults"]
                     },
                     description: "Fields to include for each test result"
                   }
