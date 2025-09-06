@@ -1,4 +1,4 @@
-import { McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+import { McpError, ErrorCode } from "@modelcontextprotocol/sdk";
 export function validateRequired(params, requiredFields) {
     const missingFields = requiredFields.filter(field => !params[field]);
     if (missingFields.length > 0) {

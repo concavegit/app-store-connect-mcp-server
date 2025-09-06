@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { ListToolsRequestSchema, CallToolRequestSchema, ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import { Server } from "@modelcontextprotocol/sdk/server";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server";
+import { ListToolsRequestSchema, CallToolRequestSchema, ErrorCode, McpError } from "@modelcontextprotocol/sdk";
 import axios from 'axios';
 import { AppStoreConnectClient } from './services/index.js';
 import { AppHandlers, BetaHandlers, BundleHandlers, DeviceHandlers, UserHandlers, AnalyticsHandlers, XcodeHandlers, LocalizationHandlers, WorkflowHandlers } from './handlers/index.js';
@@ -10,7 +10,7 @@ const config = {
     keyId: process.env.APP_STORE_CONNECT_KEY_ID,
     issuerId: process.env.APP_STORE_CONNECT_ISSUER_ID,
     privateKeyPath: process.env.APP_STORE_CONNECT_P8_PATH,
-    privateKeyString: process.env.APP_STORE_CONNECT_P8_STRING,
+    privateKeyString: process.env.APP_STORE_CONNECT_P8_B64_STRING,
     vendorNumber: process.env.APP_STORE_CONNECT_VENDOR_NUMBER, // Optional for sales/finance reports
 };
 class AppStoreConnectServer {
