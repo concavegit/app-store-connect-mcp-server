@@ -362,7 +362,7 @@ export type CiIssueSortOptions =
 export type CiIssueFieldOptions = 
   | "issueType"
   | "message"
-  | "fileLocation"
+  | "fileSource"
   | "category";
 
 export type CiIssueIncludeOptions =
@@ -436,9 +436,9 @@ export type CiTestResultFieldOptions =
   | "className"
   | "name"
   | "status"
-  | "fileLocation"
-  | "failureMessage"
-  | "duration";
+  | "fileSource"
+  | "message"
+  | "destinationTestResults";
 
 export type CiTestResultIncludeOptions =
   | "buildAction"
