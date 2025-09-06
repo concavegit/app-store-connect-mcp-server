@@ -1,5 +1,5 @@
-import * as jwt from 'jsonwebtoken';
-import { readFile } from 'fs/promises';
+import jwt from 'jsonwebtoken';
+import fs from 'fs/promises';
 export class AuthService {
     config;
     constructor(config) {
@@ -12,7 +12,7 @@ export class AuthService {
             privateKey = Buffer.from(this.config.privateKeyString, 'base64').toString('utf-8');
         }
         else if (this.config.privateKeyPath) {
-            privateKey = await readFile(this.config.privateKeyPath, 'utf-8');
+            privateKey = await fs.readFile(this.config.privateKeyPath, 'utf-8');
         }
         else {
             throw new Error("Either privateKeyPath or privateKeyString must be provided");
