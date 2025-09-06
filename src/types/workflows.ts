@@ -306,7 +306,7 @@ export interface CiIssue {
   attributes: {
     issueType: "ANALYZER_WARNING" | "ERROR" | "TEST_FAILURE" | "WARNING";
     message: string;
-    fileLocation?: {
+    fileSource?: {
       filePath?: string;
       line?: number;
       column?: number;
@@ -362,7 +362,7 @@ export type CiIssueSortOptions =
 export type CiIssueFieldOptions = 
   | "issueType"
   | "message"
-  | "fileLocation"
+  | "fileSource"
   | "category";
 
 export type CiIssueIncludeOptions =
