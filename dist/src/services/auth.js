@@ -8,7 +8,8 @@ export class AuthService {
     async generateToken() {
         let privateKey;
         if (this.config.privateKeyString) {
-            privateKey = this.config.privateKeyString;
+            // Decode base64 encoded private key
+            privateKey = Buffer.from(this.config.privateKeyString, 'base64').toString('utf-8');
         }
         else if (this.config.privateKeyPath) {
             privateKey = await fs.readFile(this.config.privateKeyPath, 'utf-8');
@@ -32,7 +33,7 @@ export class AuthService {
         }
         if (!this.config.privateKeyPath && !this.config.privateKeyString) {
             throw new Error("Missing private key configuration. Please set either: " +
-                "APP_STORE_CONNECT_P8_PATH (file path) or APP_STORE_CONNECT_P8_STRING (key content)");
+                "APP_STORE_CONNECT_P8_PATH (file path) or APP_STORE_CONNECT_P8_B64_STRING (base64 encoded key content)");
         }
     }
 }

@@ -2,7 +2,7 @@ export interface AppStoreConnectConfig {
   keyId: string;
   issuerId: string;
   privateKeyPath?: string;
-  privateKeyString?: string;
+  privateKeyString?: string; // Base64 encoded private key content
   vendorNumber?: string; // Optional vendor number for sales and finance reports
 }
 
