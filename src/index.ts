@@ -1122,7 +1122,7 @@ class AppStoreConnectServer {
                     type: "array",
                     items: {
                       type: "string",
-                      enum: ["issueType", "message", "fileLocation", "category"]
+                      enum: ["issueType", "message", "category"]
                     },
                     description: "Fields to include for each issue"
                   }
@@ -1191,7 +1191,7 @@ class AppStoreConnectServer {
                     type: "array",
                     items: {
                       type: "string",
-                      enum: ["className", "name", "status", "fileLocation", "failureMessage", "duration"]
+                      enum: ["className", "name", "status", "failureMessage", "duration"]
                     },
                     description: "Fields to include for each test result"
                   }
