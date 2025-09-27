@@ -1,15 +1,15 @@
 schema_version: v1
 name: appstore-connect-mcp-server
 description: A Model Context Protocol (MCP) server for interacting with the App Store Connect API. Supports app management, beta testing, analytics, and optional sales/finance reporting.
-repository: https://github.com/JoshuaRileyDev/app-store-connect
-homepage: https://github.com/JoshuaRileyDev/app-store-connect
+repository: https://github.com/concavegit/app-store-connect-mcp-server
+homepage: https://github.com/concavegit/app-store-connect-mcp-server
 license: MIT
 runtime: docker
 vendor:
-  name: Joshua Riley
-  github: JoshuaRileyDev
+  name: concavegit
+  github: concavegit
 mcp:
-  version: 1.0.3
+  version: 1.1.2
   protocol_version: "0.1"
   compatible_clients:
     - name: claude
@@ -24,9 +24,13 @@ config:
     required: true
     example: "12345678-1234-1234-1234-123456789012"
   - name: APP_STORE_CONNECT_P8_PATH
-    description: Absolute path to your App Store Connect P8 private key file (downloaded from App Store Connect)
-    required: true
+    description: Absolute path to your App Store Connect P8 private key file (downloaded from App Store Connect). Use this OR APP_STORE_CONNECT_P8_B64_STRING, not both.
+    required: false
     example: "/Users/username/.appstore/AuthKey_ABC123DEF4.p8"
+  - name: APP_STORE_CONNECT_P8_B64_STRING
+    description: Base64 encoded contents of your App Store Connect P8 private key file (useful for CI/CD and cloud deployments). Use this OR APP_STORE_CONNECT_P8_PATH, not both.
+    required: false
+    example: "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCllPVVJfUFJJVkFURV9LRVlfQ09OVEVOVF9IRVJFCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0="
   - name: APP_STORE_CONNECT_VENDOR_NUMBER
     description: |
       Your vendor number from App Store Connect (optional - enables sales and finance reporting tools).
