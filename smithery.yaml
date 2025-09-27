@@ -4,7 +4,9 @@ description: A Model Context Protocol (MCP) server for interacting with the App 
 repository: https://github.com/concavegit/app-store-connect-mcp-server
 homepage: https://github.com/concavegit/app-store-connect-mcp-server
 license: MIT
-runtime: docker
+runtime: typescript
+typescript:
+  entrypoint: dist/src/index.js
 vendor:
   name: concavegit
   github: concavegit
