@@ -1,0 +1,56 @@
+# Dependencies (comment out to allow copying for Docker builds with npm issues)
+# node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs (comment out dist to allow copying pre-built files)
+# dist/
+build/
+
+# Environment files
+.env*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# Development files
+.DS_Store
+*.log
+coverage/
+.nyc_output/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+
+# Testing
+test/
+tests/
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# CI/CD
+.github/
+.travis.yml
+.circleci/
+
+# Temporary files
+tmp/
+temp/
