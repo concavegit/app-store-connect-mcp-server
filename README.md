@@ -110,7 +110,13 @@ npx @smithery/cli install appstore-connect-mcp-server --client claude
 ### Manual Installation
 
 ```bash
-npm install @joshuarileydev/app-store-connect-mcp-server
+npm install -g appstore-connect-mcp-server
+```
+
+Or use directly with npx:
+
+```bash
+npx -y appstore-connect-mcp-server
 ```
 
 ## Configuration

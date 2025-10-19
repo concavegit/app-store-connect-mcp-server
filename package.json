@@ -1,7 +1,30 @@
 {
   "name": "appstore-connect-mcp-server",
   "version": "1.1.2",
+  "description": "A Model Context Protocol (MCP) server for interacting with the App Store Connect API. Supports app management, beta testing, analytics, and optional sales/finance reporting.",
   "type": "module",
+  "author": "concavegit",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/concavegit/app-store-connect-mcp-server.git"
+  },
+  "homepage": "https://github.com/concavegit/app-store-connect-mcp-server",
+  "bugs": {
+    "url": "https://github.com/concavegit/app-store-connect-mcp-server/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "app-store-connect",
+    "apple",
+    "ios",
+    "app-store",
+    "testflight",
+    "beta-testing",
+    "claude",
+    "ai"
+  ],
   "bin": {
     "appstore-connect-mcp-server": ".smithery/stdio/index.cjs"
   },
@@ -29,5 +52,8 @@
     "@types/node": "^18.0.0",
     "shx": "^0.3.4",
     "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
