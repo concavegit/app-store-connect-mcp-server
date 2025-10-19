@@ -2,9 +2,12 @@
   "name": "appstore-connect-mcp-server",
   "version": "1.1.2",
   "type": "module",
+  "module": "./src/index.ts",
   "scripts": {
     "build": "tsc && shx chmod +x dist/src/*.js",
-    "start": "node dist/src/index.js"
+    "start": "node dist/src/index.js",
+    "dev": "smithery dev",
+    "smithery:build": "smithery build"
   },
   "bin": {
     "appstore-connect-mcp": "./dist/src/index.js"
@@ -16,6 +19,7 @@
     "sharp": "^0.32.0"
   },
   "devDependencies": {
+    "@smithery/cli": "^1.6.2",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^18.0.0",
     "shx": "^0.3.4",
