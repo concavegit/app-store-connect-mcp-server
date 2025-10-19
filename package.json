@@ -2,12 +2,20 @@
   "name": "appstore-connect-mcp-server",
   "version": "1.1.2",
   "type": "module",
-  "scripts": {
-    "build": "tsc && shx chmod +x dist/src/*.js",
-    "start": "node dist/src/index.js"
-  },
   "bin": {
-    "appstore-connect-mcp": "./dist/src/index.js"
+    "appstore-connect-mcp-server": ".smithery/stdio/index.cjs"
+  },
+  "files": [
+    ".smithery"
+  ],
+  "scripts": {
+    "build": "npm run build:shttp && npm run build:stdio",
+    "build:stdio": "smithery build src/index.ts --transport stdio -o .smithery/stdio/index.cjs && echo '#!/usr/bin/env node' | cat - .smithery/stdio/index.cjs > temp && mv temp .smithery/stdio/index.cjs && chmod +x .smithery/stdio/index.cjs",
+    "build:shttp": "smithery build src/index.ts --transport shttp -o .smithery/shttp/index.cjs",
+    "prepare": "npm run build:stdio",
+    "prepublishOnly": "npm run build:stdio",
+    "dev": "npx @smithery/cli@latest dev",
+    "start": "node dist/src/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.5",
@@ -16,6 +24,7 @@
     "sharp": "^0.32.0"
   },
   "devDependencies": {
+    "@smithery/cli": "^1.4.4",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^18.0.0",
     "shx": "^0.3.4",
