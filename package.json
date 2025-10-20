@@ -39,13 +39,12 @@
     "build:smithery": "npm run build:smithery:shttp && npm run build:smithery:stdio",
     "build:smithery:stdio": "npx @smithery/cli build src/index.ts --transport stdio -o .smithery/stdio/index.cjs && echo '#!/usr/bin/env node' | cat - .smithery/stdio/index.cjs > temp && mv temp .smithery/stdio/index.cjs && chmod +x .smithery/stdio/index.cjs",
     "build:smithery:shttp": "npx @smithery/cli build src/index.ts --transport shttp -o .smithery/shttp/index.cjs",
-    "prepare": "npm run build",
     "prepublishOnly": "npm run build && npm run build:smithery:stdio",
     "dev": "npx @smithery/cli@latest dev",
     "start": "node dist/src/index.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.5",
+    "@modelcontextprotocol/sdk": "^1.20.1",
     "axios": "^1.6.0",
     "jsonwebtoken": "^9.0.0",
     "sharp": "^0.32.0"
