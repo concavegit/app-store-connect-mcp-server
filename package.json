@@ -27,30 +27,31 @@
     "ai"
   ],
   "bin": {
-    "appstore-connect-mcp-server": ".smithery/stdio/index.cjs"
+    "appstore-connect-mcp-server": "./dist/src/index.js"
   },
   "files": [
-    ".smithery",
+    "dist",
     "src",
     "tsconfig.json"
   ],
   "scripts": {
-    "build": "npm run build:shttp && npm run build:stdio",
-    "build:stdio": "npx @smithery/cli build src/index.ts --transport stdio -o .smithery/stdio/index.cjs && echo '#!/usr/bin/env node' | cat - .smithery/stdio/index.cjs > temp && mv temp .smithery/stdio/index.cjs && chmod +x .smithery/stdio/index.cjs",
-    "build:shttp": "npx @smithery/cli build src/index.ts --transport shttp -o .smithery/shttp/index.cjs",
-    "prepare": "npm run build:stdio",
-    "prepublishOnly": "npm run build:stdio",
+    "build": "tsc && shx chmod +x dist/src/*.js",
+    "build:smithery": "npm run build:smithery:shttp && npm run build:smithery:stdio",
+    "build:smithery:stdio": "npx @smithery/cli build src/index.ts --transport stdio -o .smithery/stdio/index.cjs && echo '#!/usr/bin/env node' | cat - .smithery/stdio/index.cjs > temp && mv temp .smithery/stdio/index.cjs && chmod +x .smithery/stdio/index.cjs",
+    "build:smithery:shttp": "npx @smithery/cli build src/index.ts --transport shttp -o .smithery/shttp/index.cjs",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build && npm run build:smithery:stdio",
     "dev": "npx @smithery/cli@latest dev",
     "start": "node dist/src/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.5",
-    "@smithery/cli": "^1.4.4",
     "axios": "^1.6.0",
     "jsonwebtoken": "^9.0.0",
     "sharp": "^0.32.0"
   },
   "devDependencies": {
+    "@smithery/cli": "^1.4.4",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^18.0.0",
     "shx": "^0.3.4",
