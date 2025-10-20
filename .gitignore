@@ -74,3 +74,6 @@ Thumbs.db
 # Authentication keys (IMPORTANT!)
 *.p8
 AuthKey_*.p8
+
+# Smithery build output
+.smithery/
