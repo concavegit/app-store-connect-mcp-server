@@ -1,24 +1,62 @@
 {
   "name": "appstore-connect-mcp-server",
   "version": "1.1.2",
+  "description": "A Model Context Protocol (MCP) server for interacting with the App Store Connect API. Supports app management, beta testing, analytics, and optional sales/finance reporting.",
   "type": "module",
+  "module": "src/index.ts",
+  "author": "concavegit",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/concavegit/app-store-connect-mcp-server.git"
+  },
+  "homepage": "https://github.com/concavegit/app-store-connect-mcp-server",
+  "bugs": {
+    "url": "https://github.com/concavegit/app-store-connect-mcp-server/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "app-store-connect",
+    "apple",
+    "ios",
+    "app-store",
+    "testflight",
+    "beta-testing",
+    "claude",
+    "ai"
+  ],
+  "bin": {
+    "appstore-connect-mcp-server": "./dist/src/index.js"
+  },
+  "files": [
+    "dist",
+    "src",
+    "tsconfig.json"
+  ],
   "scripts": {
     "build": "tsc && shx chmod +x dist/src/*.js",
+    "build:smithery": "npm run build:smithery:shttp && npm run build:smithery:stdio",
+    "build:smithery:stdio": "npx @smithery/cli build src/index.ts --transport stdio -o .smithery/stdio/index.cjs && echo '#!/usr/bin/env node' | cat - .smithery/stdio/index.cjs > temp && mv temp .smithery/stdio/index.cjs && chmod +x .smithery/stdio/index.cjs",
+    "build:smithery:shttp": "npx @smithery/cli build src/index.ts --transport shttp -o .smithery/shttp/index.cjs",
+    "prepublishOnly": "npm run build && npm run build:smithery:stdio",
+    "dev": "npx @smithery/cli@latest dev",
     "start": "node dist/src/index.js"
   },
-  "bin": {
-    "appstore-connect-mcp": "./dist/src/index.js"
-  },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.5",
+    "@modelcontextprotocol/sdk": "^1.20.1",
     "axios": "^1.6.0",
     "jsonwebtoken": "^9.0.0",
     "sharp": "^0.32.0"
   },
   "devDependencies": {
+    "@smithery/cli": "^1.4.4",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^18.0.0",
     "shx": "^0.3.4",
     "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
