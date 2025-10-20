@@ -3,6 +3,7 @@
   "version": "1.1.2",
   "description": "A Model Context Protocol (MCP) server for interacting with the App Store Connect API. Supports app management, beta testing, analytics, and optional sales/finance reporting.",
   "type": "module",
+  "module": "src/index.ts",
   "author": "concavegit",
   "license": "MIT",
   "repository": {
@@ -33,8 +34,8 @@
   ],
   "scripts": {
     "build": "npm run build:shttp && npm run build:stdio",
-    "build:stdio": "smithery build src/index.ts --transport stdio -o .smithery/stdio/index.cjs && echo '#!/usr/bin/env node' | cat - .smithery/stdio/index.cjs > temp && mv temp .smithery/stdio/index.cjs && chmod +x .smithery/stdio/index.cjs",
-    "build:shttp": "smithery build src/index.ts --transport shttp -o .smithery/shttp/index.cjs",
+    "build:stdio": "npx @smithery/cli build src/index.ts --transport stdio -o .smithery/stdio/index.cjs && echo '#!/usr/bin/env node' | cat - .smithery/stdio/index.cjs > temp && mv temp .smithery/stdio/index.cjs && chmod +x .smithery/stdio/index.cjs",
+    "build:shttp": "npx @smithery/cli build src/index.ts --transport shttp -o .smithery/shttp/index.cjs",
     "prepare": "npm run build:stdio",
     "prepublishOnly": "npm run build:stdio",
     "dev": "npx @smithery/cli@latest dev",
