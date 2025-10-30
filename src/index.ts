@@ -26,25 +26,13 @@ import {
   WorkflowHandlers
 } from './handlers/index.js';
 
-const baseConfig = z.object({
+export const configSchema = z.object({
   APP_STORE_CONNECT_KEY_ID: z.string().min(1).describe("Your App Store Connect API Key ID (found in App Store Connect > Users and Access > Keys)"),
   APP_STORE_CONNECT_ISSUER_ID: z.string().min(1).describe("Your App Store Connect Issuer ID (found in App Store Connect > Users and Access > Keys)"),
+  APP_STORE_CONNECT_P8_B64_STRING: z.string().optional().describe("Base64 encoded contents of your App Store Connect P8 private key file (provide either this or P8_PATH)"),
+  APP_STORE_CONNECT_P8_PATH: z.string().optional().describe("Absolute path to your App Store Connect P8 private key file (provide either this or P8_B64_STRING)"),
   APP_STORE_CONNECT_VENDOR_NUMBER: z.string().optional().describe("Your vendor number from App Store Connect (optional - enables sales and finance reporting tools)")
 });
-
-const withBase64Key = z.object({
-  APP_STORE_CONNECT_P8_B64_STRING: z.string().min(1).describe("Base64 encoded contents of your App Store Connect P8 private key file"),
-  APP_STORE_CONNECT_P8_PATH: z.undefined().optional()
-});
-
-const withPathKey = z.object({
-  APP_STORE_CONNECT_P8_PATH: z.string().min(1).describe("Absolute path to your App Store Connect P8 private key file"),
-  APP_STORE_CONNECT_P8_B64_STRING: z.undefined().optional()
-});
-
-export const sessionConfig = baseConfig.and(z.union([withBase64Key, withPathKey]));
-
-export const config = sessionConfig;
 
 // Helper function to load config from environment variables
 function loadConfigFromEnv(): AppStoreConnectConfig {
@@ -1484,19 +1472,20 @@ class AppStoreConnectServer {
   }
 }
 
-function createServer({ config: smitheryConfig }: { config?: z.infer<typeof sessionConfig> } = {}) {
-  if (smitheryConfig) {
+export default function createServer({ config }: { config?: z.infer<typeof configSchema> } = {}) {
+  if (config) {
+    console.log(`[config] keyId:${Boolean(config?.APP_STORE_CONNECT_KEY_ID)} issuerId:${Boolean(config?.APP_STORE_CONNECT_ISSUER_ID)} b64Len:${config?.APP_STORE_CONNECT_P8_B64_STRING?.length ?? 0} pathSet:${Boolean(config?.APP_STORE_CONNECT_P8_PATH)} vendorSet:${Boolean(config?.APP_STORE_CONNECT_VENDOR_NUMBER)}`);
     console.log("Smithery config received, setting credentials...");
-    process.env.APP_STORE_CONNECT_KEY_ID = smitheryConfig.APP_STORE_CONNECT_KEY_ID;
-    process.env.APP_STORE_CONNECT_ISSUER_ID = smitheryConfig.APP_STORE_CONNECT_ISSUER_ID;
-    if (smitheryConfig.APP_STORE_CONNECT_P8_B64_STRING) {
-      process.env.APP_STORE_CONNECT_P8_B64_STRING = smitheryConfig.APP_STORE_CONNECT_P8_B64_STRING;
+    process.env.APP_STORE_CONNECT_KEY_ID = config.APP_STORE_CONNECT_KEY_ID;
+    process.env.APP_STORE_CONNECT_ISSUER_ID = config.APP_STORE_CONNECT_ISSUER_ID;
+    if (config.APP_STORE_CONNECT_P8_B64_STRING) {
+      process.env.APP_STORE_CONNECT_P8_B64_STRING = config.APP_STORE_CONNECT_P8_B64_STRING;
     }
-    if (smitheryConfig.APP_STORE_CONNECT_P8_PATH) {
-      process.env.APP_STORE_CONNECT_P8_PATH = smitheryConfig.APP_STORE_CONNECT_P8_PATH;
+    if (config.APP_STORE_CONNECT_P8_PATH) {
+      process.env.APP_STORE_CONNECT_P8_PATH = config.APP_STORE_CONNECT_P8_PATH;
     }
-    if (smitheryConfig.APP_STORE_CONNECT_VENDOR_NUMBER) {
-      process.env.APP_STORE_CONNECT_VENDOR_NUMBER = smitheryConfig.APP_STORE_CONNECT_VENDOR_NUMBER;
+    if (config.APP_STORE_CONNECT_VENDOR_NUMBER) {
+      process.env.APP_STORE_CONNECT_VENDOR_NUMBER = config.APP_STORE_CONNECT_VENDOR_NUMBER;
     }
   }
   
@@ -1522,10 +1511,7 @@ function createServer({ config: smitheryConfig }: { config?: z.infer<typeof sess
   return server.server;
 }
 
-Object.assign(createServer, { config: sessionConfig });
-
-export default createServer;
-export { sessionConfig as configSchema };
+Object.assign(createServer, { config: configSchema });
 
 // Start the server directly when run as a script (not through Smithery)
 if (import.meta.url === `file://${process.argv[1]}`) {
