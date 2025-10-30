@@ -35,7 +35,7 @@ const config: AppStoreConnectConfig = {
 };
 
 class AppStoreConnectServer {
-  private server: Server;
+  public server: Server;
   private client: AppStoreConnectClient;
   private appHandlers: AppHandlers;
   private betaHandlers: BetaHandlers;
@@ -1459,6 +1459,13 @@ class AppStoreConnectServer {
   }
 }
 
-// Start the server
-const server = new AppStoreConnectServer();
-server.run().catch(console.error);
+export default function createServer() {
+  const server = new AppStoreConnectServer();
+  return server.server;
+}
+
+// Start the server directly when run as a script (not through Smithery)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const server = new AppStoreConnectServer();
+  server.run().catch(console.error);
+}
