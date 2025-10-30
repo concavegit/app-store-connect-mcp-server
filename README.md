@@ -2,6 +2,7 @@
 
 A Model Context Protocol (MCP) server for interacting with the App Store Connect API. This server provides tools for managing apps, beta testers, bundle IDs, devices, app metadata, and capabilities in App Store Connect.
 
+[![smithery badge](https://smithery.ai/badge/@concavegit/app-store-connect-mcp-server)](https://smithery.ai/server/@concavegit/app-store-connect-mcp-server)
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=app-store-connect&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMm5weCUyMC15JTIwYXBwc3RvcmUtY29ubmVjdC1tY3Atc2VydmVyJTIyJTdE)
 
 ## Overview
@@ -99,12 +100,20 @@ This server transforms complex App Store Connect operations into simple conversa
 
 ## Installation
 
-### Using Smithery
+### Installing via Smithery
 
-To install App Store Connect Server for Claude Desktop automatically:
+To install appstore-connect-mcp-server automatically via [Smithery](https://smithery.ai/server/@concavegit/app-store-connect-mcp-server):
 
 ```bash
-npx @smithery/cli install appstore-connect-mcp-server --client claude
+npx -y @smithery/cli install @concavegit/app-store-connect-mcp-server --client claude
+```
+
+### Using Smithery
+
+To install App Store Connect Server automatically:
+
+```bash
+npx -y @smithery/cli install appstore-connect-mcp-server
 ```
 
 ### Manual Installation
