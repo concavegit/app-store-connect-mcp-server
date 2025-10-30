@@ -1398,12 +1398,14 @@ export default function createServer({ config: smitheryConfig } = {}) {
     }
     const appConfig = loadConfigFromEnv();
     if (!appConfig.keyId || !appConfig.issuerId) {
-        throw new Error("Missing required App Store Connect credentials. Please provide: " +
-            "APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID");
+        console.warn("Warning: Missing App Store Connect credentials. " +
+            "Please configure APP_STORE_CONNECT_KEY_ID and APP_STORE_CONNECT_ISSUER_ID. " +
+            "Tools will fail until credentials are provided.");
     }
     if (!appConfig.privateKeyPath && !appConfig.privateKeyString) {
-        throw new Error("Missing App Store Connect private key. Please provide either: " +
-            "APP_STORE_CONNECT_P8_PATH (file path) or APP_STORE_CONNECT_P8_B64_STRING (base64 encoded key)");
+        console.warn("Warning: Missing App Store Connect private key. " +
+            "Please configure either APP_STORE_CONNECT_P8_PATH or APP_STORE_CONNECT_P8_B64_STRING. " +
+            "Tools will fail until a private key is provided.");
     }
     const server = new AppStoreConnectServer(appConfig);
     return server.server;

@@ -8,7 +8,6 @@ export class AppStoreConnectClient {
 
   constructor(config: AppStoreConnectConfig) {
     this.authService = new AuthService(config);
-    this.authService.validateConfig();
     
     this.axiosInstance = axios.create({
       baseURL: 'https://api.appstoreconnect.apple.com/v1',
