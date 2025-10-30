@@ -26,18 +26,25 @@ import {
   WorkflowHandlers
 } from './handlers/index.js';
 
-export const config = z.object({
-  APP_STORE_CONNECT_KEY_ID: z.string().describe("Your App Store Connect API Key ID (found in App Store Connect > Users and Access > Keys)"),
-  APP_STORE_CONNECT_ISSUER_ID: z.string().describe("Your App Store Connect Issuer ID (found in App Store Connect > Users and Access > Keys)"),
-  APP_STORE_CONNECT_P8_B64_STRING: z.string().optional().describe("Base64 encoded contents of your App Store Connect P8 private key file (useful for CI/CD and cloud deployments)"),
-  APP_STORE_CONNECT_P8_PATH: z.string().optional().describe("Absolute path to your App Store Connect P8 private key file"),
+const baseConfig = z.object({
+  APP_STORE_CONNECT_KEY_ID: z.string().min(1).describe("Your App Store Connect API Key ID (found in App Store Connect > Users and Access > Keys)"),
+  APP_STORE_CONNECT_ISSUER_ID: z.string().min(1).describe("Your App Store Connect Issuer ID (found in App Store Connect > Users and Access > Keys)"),
   APP_STORE_CONNECT_VENDOR_NUMBER: z.string().optional().describe("Your vendor number from App Store Connect (optional - enables sales and finance reporting tools)")
-}).refine(
-  (data) => !!(data.APP_STORE_CONNECT_P8_B64_STRING || data.APP_STORE_CONNECT_P8_PATH),
-  {
-    message: "Either APP_STORE_CONNECT_P8_B64_STRING or APP_STORE_CONNECT_P8_PATH must be provided"
-  }
-);
+});
+
+const withBase64Key = z.object({
+  APP_STORE_CONNECT_P8_B64_STRING: z.string().min(1).describe("Base64 encoded contents of your App Store Connect P8 private key file"),
+  APP_STORE_CONNECT_P8_PATH: z.undefined().optional()
+});
+
+const withPathKey = z.object({
+  APP_STORE_CONNECT_P8_PATH: z.string().min(1).describe("Absolute path to your App Store Connect P8 private key file"),
+  APP_STORE_CONNECT_P8_B64_STRING: z.undefined().optional()
+});
+
+export const sessionConfig = baseConfig.and(z.union([withBase64Key, withPathKey]));
+
+export const config = sessionConfig;
 
 // Helper function to load config from environment variables
 function loadConfigFromEnv(): AppStoreConnectConfig {
@@ -1477,8 +1484,9 @@ class AppStoreConnectServer {
   }
 }
 
-export default function createServer({ config: smitheryConfig }: { config?: z.infer<typeof config> } = {}) {
+function createServer({ config: smitheryConfig }: { config?: z.infer<typeof sessionConfig> } = {}) {
   if (smitheryConfig) {
+    console.log("Smithery config received, setting credentials...");
     process.env.APP_STORE_CONNECT_KEY_ID = smitheryConfig.APP_STORE_CONNECT_KEY_ID;
     process.env.APP_STORE_CONNECT_ISSUER_ID = smitheryConfig.APP_STORE_CONNECT_ISSUER_ID;
     if (smitheryConfig.APP_STORE_CONNECT_P8_B64_STRING) {
@@ -1513,6 +1521,11 @@ export default function createServer({ config: smitheryConfig }: { config?: z.in
   const server = new AppStoreConnectServer(appConfig);
   return server.server;
 }
+
+Object.assign(createServer, { config: sessionConfig });
+
+export default createServer;
+export { sessionConfig as configSchema };
 
 // Start the server directly when run as a script (not through Smithery)
 if (import.meta.url === `file://${process.argv[1]}`) {
