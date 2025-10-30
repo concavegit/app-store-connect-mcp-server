@@ -10,6 +10,7 @@ import {
   McpError
 } from "@modelcontextprotocol/sdk/types.js";
 import axios from 'axios';
+import { z } from 'zod';
 
 import { AppStoreConnectConfig } from './types/index.js';
 import { AppStoreConnectClient } from './services/index.js';
@@ -25,14 +26,29 @@ import {
   WorkflowHandlers
 } from './handlers/index.js';
 
-// Load environment variables
-const config: AppStoreConnectConfig = {
-  keyId: process.env.APP_STORE_CONNECT_KEY_ID!,
-  issuerId: process.env.APP_STORE_CONNECT_ISSUER_ID!,
-  privateKeyPath: process.env.APP_STORE_CONNECT_P8_PATH,
-  privateKeyString: process.env.APP_STORE_CONNECT_P8_B64_STRING,
-  vendorNumber: process.env.APP_STORE_CONNECT_VENDOR_NUMBER, // Optional for sales/finance reports
-};
+export const config = z.object({
+  APP_STORE_CONNECT_KEY_ID: z.string().describe("Your App Store Connect API Key ID (found in App Store Connect > Users and Access > Keys)"),
+  APP_STORE_CONNECT_ISSUER_ID: z.string().describe("Your App Store Connect Issuer ID (found in App Store Connect > Users and Access > Keys)"),
+  APP_STORE_CONNECT_P8_B64_STRING: z.string().optional().describe("Base64 encoded contents of your App Store Connect P8 private key file (useful for CI/CD and cloud deployments)"),
+  APP_STORE_CONNECT_P8_PATH: z.string().optional().describe("Absolute path to your App Store Connect P8 private key file"),
+  APP_STORE_CONNECT_VENDOR_NUMBER: z.string().optional().describe("Your vendor number from App Store Connect (optional - enables sales and finance reporting tools)")
+}).refine(
+  (data) => !!(data.APP_STORE_CONNECT_P8_B64_STRING || data.APP_STORE_CONNECT_P8_PATH),
+  {
+    message: "Either APP_STORE_CONNECT_P8_B64_STRING or APP_STORE_CONNECT_P8_PATH must be provided"
+  }
+);
+
+// Helper function to load config from environment variables
+function loadConfigFromEnv(): AppStoreConnectConfig {
+  return {
+    keyId: process.env.APP_STORE_CONNECT_KEY_ID!,
+    issuerId: process.env.APP_STORE_CONNECT_ISSUER_ID!,
+    privateKeyPath: process.env.APP_STORE_CONNECT_P8_PATH,
+    privateKeyString: process.env.APP_STORE_CONNECT_P8_B64_STRING,
+    vendorNumber: process.env.APP_STORE_CONNECT_VENDOR_NUMBER,
+  };
+}
 
 class AppStoreConnectServer {
   public server: Server;
@@ -46,8 +62,10 @@ class AppStoreConnectServer {
   private xcodeHandlers: XcodeHandlers;
   private localizationHandlers: LocalizationHandlers;
   private workflowHandlers: WorkflowHandlers;
+  private vendorNumber?: string;
 
-  constructor() {
+  constructor(appConfig: AppStoreConnectConfig) {
+    this.vendorNumber = appConfig.vendorNumber;
     this.server = new Server({
       name: "appstore-connect-server",
       version: "1.0.0"
@@ -57,13 +75,13 @@ class AppStoreConnectServer {
       }
     });
 
-    this.client = new AppStoreConnectClient(config);
+    this.client = new AppStoreConnectClient(appConfig);
     this.appHandlers = new AppHandlers(this.client);
     this.betaHandlers = new BetaHandlers(this.client);
     this.bundleHandlers = new BundleHandlers(this.client);
     this.deviceHandlers = new DeviceHandlers(this.client);
     this.userHandlers = new UserHandlers(this.client);
-    this.analyticsHandlers = new AnalyticsHandlers(this.client, config);
+    this.analyticsHandlers = new AnalyticsHandlers(this.client, appConfig);
     this.xcodeHandlers = new XcodeHandlers();
     this.localizationHandlers = new LocalizationHandlers(this.client);
     this.workflowHandlers = new WorkflowHandlers(this.client);
@@ -1213,7 +1231,7 @@ class AppStoreConnectServer {
             vendorNumber: {
               type: "string",
               description: "Your vendor number from App Store Connect (optional if set as environment variable)",
-              default: config.vendorNumber
+              default: this.vendorNumber
             },
             reportType: {
               type: "string",
@@ -1250,7 +1268,7 @@ class AppStoreConnectServer {
             vendorNumber: {
               type: "string",
               description: "Your vendor number from App Store Connect (optional if set as environment variable)",
-              default: config.vendorNumber
+              default: this.vendorNumber
             },
             reportDate: {
               type: "string",
@@ -1267,7 +1285,7 @@ class AppStoreConnectServer {
     ];
 
     // Only include payment report tools if vendor number is configured
-    if (config.vendorNumber) {
+    if (this.vendorNumber) {
       return [...baseTools, ...paymentReportTools];
     }
 
@@ -1385,7 +1403,7 @@ class AppStoreConnectServer {
             return { toolResult: await this.analyticsHandlers.downloadAnalyticsReportSegment(args as any) };
           
           case "download_sales_report":
-            if (!config.vendorNumber) {
+            if (!this.vendorNumber) {
               throw new McpError(
                 ErrorCode.MethodNotFound,
                 "Sales reports are not available. Please set APP_STORE_CONNECT_VENDOR_NUMBER environment variable."
@@ -1394,7 +1412,7 @@ class AppStoreConnectServer {
             return { toolResult: await this.analyticsHandlers.downloadSalesReport(args as any) };
           
           case "download_finance_report":
-            if (!config.vendorNumber) {
+            if (!this.vendorNumber) {
               throw new McpError(
                 ErrorCode.MethodNotFound,
                 "Finance reports are not available. Please set APP_STORE_CONNECT_VENDOR_NUMBER environment variable."
@@ -1459,13 +1477,44 @@ class AppStoreConnectServer {
   }
 }
 
-export default function createServer() {
-  const server = new AppStoreConnectServer();
+export default function createServer({ config: smitheryConfig }: { config?: z.infer<typeof config> } = {}) {
+  if (smitheryConfig) {
+    process.env.APP_STORE_CONNECT_KEY_ID = smitheryConfig.APP_STORE_CONNECT_KEY_ID;
+    process.env.APP_STORE_CONNECT_ISSUER_ID = smitheryConfig.APP_STORE_CONNECT_ISSUER_ID;
+    if (smitheryConfig.APP_STORE_CONNECT_P8_B64_STRING) {
+      process.env.APP_STORE_CONNECT_P8_B64_STRING = smitheryConfig.APP_STORE_CONNECT_P8_B64_STRING;
+    }
+    if (smitheryConfig.APP_STORE_CONNECT_P8_PATH) {
+      process.env.APP_STORE_CONNECT_P8_PATH = smitheryConfig.APP_STORE_CONNECT_P8_PATH;
+    }
+    if (smitheryConfig.APP_STORE_CONNECT_VENDOR_NUMBER) {
+      process.env.APP_STORE_CONNECT_VENDOR_NUMBER = smitheryConfig.APP_STORE_CONNECT_VENDOR_NUMBER;
+    }
+  }
+  
+  const appConfig = loadConfigFromEnv();
+  
+  if (!appConfig.keyId || !appConfig.issuerId) {
+    throw new Error(
+      "Missing required App Store Connect credentials. Please provide: " +
+      "APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID"
+    );
+  }
+  
+  if (!appConfig.privateKeyPath && !appConfig.privateKeyString) {
+    throw new Error(
+      "Missing App Store Connect private key. Please provide either: " +
+      "APP_STORE_CONNECT_P8_PATH (file path) or APP_STORE_CONNECT_P8_B64_STRING (base64 encoded key)"
+    );
+  }
+  
+  const server = new AppStoreConnectServer(appConfig);
   return server.server;
 }
 
 // Start the server directly when run as a script (not through Smithery)
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const server = new AppStoreConnectServer();
+  const appConfig = loadConfigFromEnv();
+  const server = new AppStoreConnectServer(appConfig);
   server.run().catch(console.error);
 }
