@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -1514,7 +1516,7 @@ export default function createServer({ config }: { config?: z.infer<typeof confi
 Object.assign(createServer, { config: configSchema });
 
 // Start the server directly when run as a script (not through Smithery)
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   const appConfig = loadConfigFromEnv();
   const server = new AppStoreConnectServer(appConfig);
   server.run().catch(console.error);
